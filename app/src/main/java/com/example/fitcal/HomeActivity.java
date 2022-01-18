@@ -74,7 +74,9 @@ public class HomeActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         onlineUserID = mUser.getUid();
-        reference = FirebaseDatabase.getInstance().getReference().child("dishes").child(onlineUserID);
+        reference = FirebaseDatabase.getInstance("https://fitcal-91339-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("dishes").child(onlineUserID);
+
+//        FirebaseDatabase.getInstance("https://fitcal-91339-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("dishes").child("test").setValue("test1");
 
         floatingActionButton = findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +115,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String mDish = dishText.getText().toString().trim();
                 String mCalories = caloriesText.getText().toString().trim();
+//                String id = FirebaseDatabase.getInstance("https://fitcal-91339-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("dishes").child(onlineUserID).push().getKey();
                 String id = reference.push().getKey();
                 String date = DateFormat.getDateInstance().format(new Date());
 
@@ -129,31 +132,19 @@ public class HomeActivity extends AppCompatActivity {
                     loader.show();
 
                     Model model = new Model(id, mDish, mCalories, date);
-                    reference.child(id).setValue(model).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
-                                Toast.makeText(HomeActivity.this, "Dish has been added successfully", Toast.LENGTH_SHORT).show();
-                            } else {
-                                String error= task.getException().toString();
-                                Toast.makeText(HomeActivity.this, "Failed: " + error, Toast.LENGTH_SHORT).show();
-                            }
-                            loader.dismiss();
-                        }
-                    });
-                    reference.child(id).setValue(model).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(HomeActivity.this, "Dish has been added successfully", Toast.LENGTH_SHORT).show();
-                            loader.dismiss();
-                        }
-                    }).addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception error) {
-                            Toast.makeText(HomeActivity.this, "Failed: " + error.toString(), Toast.LENGTH_SHORT).show();
-                            loader.dismiss();
-                        }
-                    });
+                    reference.child(id).setValue(model)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
+                                        Toast.makeText(HomeActivity.this, "Dish has been added successfully", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        String error= task.getException().toString();
+                                        Toast.makeText(HomeActivity.this, "Failed: " + error, Toast.LENGTH_SHORT).show();
+                                    }
+                                    loader.dismiss();
+                                }
+                            });
                 }
                 dialog.dismiss();
             }
