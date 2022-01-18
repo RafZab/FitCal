@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">FitCal</string>
+    <string name="enter_email">Enter Email</string>
+    <string name="enter_password">Enter Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="don_t_have_an_account">Don\'t have an account? Sign up</string>
+    <string name="sign_up">Sign up</string>
+    <string name="do_have_an_account">Do have an account? Sign in</string>
+    <string name="add_a_new_calories">Add a new dish</string>
+    <string name="dish">Dish</string>
+    <string name="calories">Calories</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+</resources>

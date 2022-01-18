@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "809530499643",
+    "project_id": "fitcal-91339",
+    "storage_bucket": "fitcal-91339.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:809530499643:android:85577d5f090ce66dac721e",
+        "android_client_info": {
+          "package_name": "com.example.fitcal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "809530499643-mur728b31fec6nfsoqaj9vcjphbnm014.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fitcal",
+            "certificate_hash": "656ce0658ab967b1370a6fdd8dd143fca02dd699"
+          }
+        },
+        {
+          "client_id": "809530499643-4mjt8rdqilc3is5b96pdb6rr54tde6aj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIDS8YXlZK3KtC0sHSsLz77JmZvg9UjvI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "809530499643-4mjt8rdqilc3is5b96pdb6rr54tde6aj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
