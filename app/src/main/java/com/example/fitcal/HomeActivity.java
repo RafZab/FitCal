@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -51,9 +52,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private ProgressDialog loader;
 
-//    private String key = "";
-//    private String dishName;
-//    private Integer calories;
+    private String key = "";
+    private String dishName;
+    private String calories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +80,6 @@ public class HomeActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         onlineUserID = mUser.getUid();
         reference = FirebaseDatabase.getInstance("https://fitcal-91339-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("dishes").child(onlineUserID);
-
-//        FirebaseDatabase.getInstance("https://fitcal-91339-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("dishes").child("test").setValue("test1");
 
         floatingActionButton = findViewById(R.id.fab);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -119,7 +118,6 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String mDish = dishText.getText().toString().trim();
                 String mCalories = caloriesText.getText().toString().trim();
-//                String id = FirebaseDatabase.getInstance("https://fitcal-91339-default-rtdb.europe-west1.firebasedatabase.app/").getReference().child("dishes").child(onlineUserID).push().getKey();
                 String id = reference.push().getKey();
                 String date = DateFormat.getDateInstance().format(new Date());
 
@@ -166,10 +164,21 @@ public class HomeActivity extends AppCompatActivity {
 
         FirebaseRecyclerAdapter<Model, MyViewHolder> adapter = new FirebaseRecyclerAdapter<Model, MyViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull MyViewHolder holder, int position, @NonNull Model model) {
+            protected void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") final int position, @NonNull Model model) {
                 holder.setDate(model.getDate());
                 holder.setDish(model.getDishName());
                 holder.setCalories("Calories: " + model.getCalories());
+
+                holder.mView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        key = getRef(position).getKey();
+                        dishName = model.getDishName();
+                        calories = model.getCalories();
+
+                        updateTask();
+                    }
+                });
             }
 
             @NonNull
@@ -208,4 +217,68 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
+    private void updateTask(){
+        AlertDialog.Builder myDialog = new AlertDialog.Builder(this);
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.update_data, null);
+        myDialog.setView(view);
+
+        AlertDialog dialog = myDialog.create();
+
+        EditText aDish = view.findViewById(R.id.mEditTextDish);
+        EditText aCalories = view.findViewById(R.id.mEditTextCalories);
+
+        aDish.setText(dishName);
+        aDish.setSelection(dishName.length());
+
+        aCalories.setText(calories);
+        aDish.setSelection(calories.length());
+
+        Button delBtn = view.findViewById(R.id.btnDelete);
+        Button updateBtn = view.findViewById(R.id.btnUpdate);
+
+        updateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dishName = aDish.getText().toString().trim();
+                calories = aCalories.getText().toString().trim();
+
+                String date = DateFormat.getDateInstance().format(new Date());
+
+                Model model = new Model(key, dishName, calories, date);
+
+                reference.child(key).setValue(model).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(HomeActivity.this, "Dish has been updated successfully", Toast.LENGTH_SHORT).show();
+                        } else {
+                            String err = task.getException().toString();
+                            Toast.makeText(HomeActivity.this, "Update failed: " + err, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                dialog.dismiss();
+            }
+        });
+
+        delBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reference.child(key).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(HomeActivity.this, "Dish has been deleted successfully", Toast.LENGTH_SHORT).show();
+                        } else {
+                            String err = task.getException().toString();
+                            Toast.makeText(HomeActivity.this, "Deleted failed: " + err, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
 }

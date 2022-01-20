@@ -12,9 +12,6 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="update_your_dish">Update your dish</string>
-    <string name="dish">Dish</string>
-    <string name="calories">Calories</string>
-    <string name="calories">Calories</string>
     <string name="delete">DELETE</string>
     <string name="update">UPDATE</string>
 </resources>
