@@ -10,7 +10,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -59,6 +64,13 @@ public class HomeActivity extends AppCompatActivity {
     private String dishName;
     private String calories;
 
+
+    private SensorManager sensorManager;
+    private Sensor accelerometerSensor;
+    private boolean isAccelerometerSensorAvailable, firstTime=true;
+
+    private float acelVal, acelLast, shake;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +81,18 @@ public class HomeActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.homeToolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setTitle("FitCal");
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(sensorEventListener, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
+        shake = 0.00f;
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!=null){
+            isAccelerometerSensorAvailable = true;
+        }
 
         recyclerView = findViewById(R.id.recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
@@ -302,5 +326,49 @@ public class HomeActivity extends AppCompatActivity {
                 finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private final SensorEventListener sensorEventListener = new SensorEventListener(){
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+
+            float x = event.values[0];
+            float y = event.values[1];
+            float z = event.values[2];
+
+            acelLast = acelVal;
+            acelVal = (float) Math.sqrt((double) (x*x+y*y+z*z));
+            float delta = acelVal - acelLast;
+            shake = shake*0.9f + delta;
+            if(shake > 1){
+                if(firstTime) {
+                    Toast.makeText(HomeActivity.this, "huraaa!!", Toast.LENGTH_LONG ).show();
+                }
+            }
+
+
+        }
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+        }
+    };
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+
+        if(isAccelerometerSensorAvailable){
+            sensorManager.registerListener(sensorEventListener, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(isAccelerometerSensorAvailable){
+            sensorManager.unregisterListener(sensorEventListener);
+        }
     }
 }
