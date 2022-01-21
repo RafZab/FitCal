@@ -296,7 +296,7 @@ public class HomeActivity extends AppCompatActivity {
         aDish.setSelection(dishName.length());
 
         aCalories.setText(calories);
-        aDish.setSelection(calories.length());
+        aCalories.setSelection(calories.length());
 
         Button delBtn = view.findViewById(R.id.btnDelete);
         Button updateBtn = view.findViewById(R.id.btnUpdate);
