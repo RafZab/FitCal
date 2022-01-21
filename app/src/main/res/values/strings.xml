@@ -14,4 +14,5 @@
     <string name="update_your_dish">Update your dish</string>
     <string name="delete">DELETE</string>
     <string name="update">UPDATE</string>
+    <string name="today_you_ate_90_calories">Today you ate 90 calories</string>
 </resources>

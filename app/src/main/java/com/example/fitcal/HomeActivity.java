@@ -39,17 +39,23 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 public class HomeActivity extends AppCompatActivity {
 
     Activity activity;
     private Toolbar toolbar;
+    private TextView caloriesTodayView;
     private RecyclerView recyclerView;
     private FloatingActionButton floatingActionButton;
 
@@ -81,9 +87,10 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         activity = this;
+        caloriesTodayView = findViewById(R.id.caloriesToday);
         toolbar = findViewById(R.id.homeToolbar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("FitCal " + totalCalories);
+        Objects.requireNonNull(getSupportActionBar()).setTitle("FitCal");
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -119,6 +126,32 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        getCaloriesToday();
+    }
+
+    private void getCaloriesToday() {
+        String date = DateFormat.getDateInstance().format(new Date());
+
+        Query query = reference.orderByChild("date").equalTo(date);
+        query.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int totalAmount = 0;
+                for (DataSnapshot ds :  dataSnapshot.getChildren()){
+                    Map<String, Object> map = (Map<String, Object>)ds.getValue();
+                    Object total = map.get("calories");
+                    int pTotal = Integer.parseInt(String.valueOf(total));
+                    totalAmount += pTotal;
+                    totalCalories = totalAmount;
+                }
+                caloriesTodayView.setText("Today you ate " + totalCalories + " calories");
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(HomeActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void addDish() {
@@ -294,6 +327,8 @@ public class HomeActivity extends AppCompatActivity {
         delBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                calories = aCalories.getText().toString().trim();
+
                 reference.child(key).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
