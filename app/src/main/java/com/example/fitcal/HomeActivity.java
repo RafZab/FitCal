@@ -66,8 +66,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private ProgressDialog loader;
 
-    private Integer totalCalories = 0;
-
     private String key = "";
     private String dishName;
     private String calories;
@@ -142,9 +140,8 @@ public class HomeActivity extends AppCompatActivity {
                     Object total = map.get("calories");
                     int pTotal = Integer.parseInt(String.valueOf(total));
                     totalAmount += pTotal;
-                    totalCalories = totalAmount;
                 }
-                caloriesTodayView.setText("Today you ate " + totalCalories + " calories");
+                caloriesTodayView.setText("Today you ate " + totalAmount + " calories");
             }
 
             @Override
