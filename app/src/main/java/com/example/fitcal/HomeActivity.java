@@ -60,9 +60,12 @@ public class HomeActivity extends AppCompatActivity {
 
     private ProgressDialog loader;
 
+    private Integer totalCalories = 0;
+
     private String key = "";
     private String dishName;
     private String calories;
+    private String date;
 
 
     private SensorManager sensorManager;
@@ -80,7 +83,7 @@ public class HomeActivity extends AppCompatActivity {
         activity = this;
         toolbar = findViewById(R.id.homeToolbar);
         setSupportActionBar(toolbar);
-        Objects.requireNonNull(getSupportActionBar()).setTitle("FitCal");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("FitCal " + totalCalories);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -202,6 +205,7 @@ public class HomeActivity extends AppCompatActivity {
                         key = getRef(position).getKey();
                         dishName = model.getDishName();
                         calories = model.getCalories();
+                        date = model.getDate();
 
                         updateTask();
                     }
@@ -269,8 +273,6 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 dishName = aDish.getText().toString().trim();
                 calories = aCalories.getText().toString().trim();
-
-                String date = DateFormat.getDateInstance().format(new Date());
 
                 Model model = new Model(key, dishName, calories, date);
 
@@ -343,7 +345,9 @@ public class HomeActivity extends AppCompatActivity {
             shake = shake*0.9f + delta;
             if(shake > 1){
                 if(firstTime) {
-                    Toast.makeText(HomeActivity.this, "huraaa!!", Toast.LENGTH_LONG ).show();
+                    Toast.makeText(HomeActivity.this, "Congratulations! You discovered hidden content.", Toast.LENGTH_LONG ).show();
+                    Intent intent = new Intent(HomeActivity.this, VideoActivity.class);
+                    startActivity(intent);
                 }
             }
 
